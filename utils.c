@@ -6,7 +6,13 @@
  * interpreted an n-bit integer. */
 int sign_extend_number(unsigned int field, unsigned int n) {
   /* YOUR CODE HERE */
-  return 0;
+
+  int x = 32 - n;
+  int ret = (int) field << x;
+  ret >>= x;
+  return ret;
+  
+  //return 0;
 }
 
 /* Unpacks the 32-bit machine code instruction given into the correct
@@ -44,6 +50,83 @@ Instruction parse_instruction(uint32_t instruction_bits) {
     instruction.rtype.funct7 = instruction_bits & ((1U << 7) - 1);
     break;
   // case for I-type 
+
+  case 0x03:
+  case 0x13:
+  case 0x73:
+
+    instruction.itype.rd = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.itype.funct3 = instruction_bits & ((1U << 3) - 1);
+    instruction_bits >>= 3;
+
+    instruction.itype.rs1 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.itype.imm = instruction_bits & ((1U << 12) - 1);
+    instruction_bits >>= 12;
+    break;
+  
+  //S type
+  case 0x23:
+
+    instruction.stype.imm5 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.stype.funct3 = instruction_bits & ((1U << 3) -1);
+    instruction_bits >>= 3;
+
+    instruction.stype.rs1 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.stype.rs2 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.stype.imm7 = instruction_bits & ((1U << 7) - 1);
+    instruction_bits >>= 7;
+    break;
+
+  // SB type
+  case 0x63:
+
+    instruction.sbtype.imm5 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.sbtype.funct3 = instruction_bits & ((1U << 3) - 1);
+    instruction_bits >>= 3;
+
+    instruction.sbtype.rs1 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.sbtype.rs2 = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.sbtype.imm7 = instruction_bits & ((1U << 7) - 1);
+    instruction_bits >>= 7;
+    break;
+  
+  // U type
+  case 0x37:
+
+    instruction.utype.rd = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.utype.imm = instruction_bits & ((1U << 20) - 1);
+    instruction_bits >>= 20;
+    break;
+
+  // UJ type
+  case 0x6f:
+
+    instruction.ujtype.rd = instruction_bits & ((1U << 5) - 1);
+    instruction_bits >>= 5;
+
+    instruction.ujtype.imm = instruction_bits & ((1U << 20) - 1);
+    instruction_bits >>= 20;
+    break;
+
+
   default:
     exit(EXIT_FAILURE);
   }
@@ -54,19 +137,47 @@ Instruction parse_instruction(uint32_t instruction_bits) {
  * the given branch instruction */
 int get_branch_offset(Instruction instruction) {
   /* YOUR CODE HERE */
-  return 0;
+
+  int offset = 0x00000000;
+
+  offset |= instruction.sbtype.imm5 & 0x00000001;
+  offset <<= 10;
+  offset |= (instruction.sbtype.imm5 >> 1) & 0x0000000f;
+  offset |= (instruction.sbtype.imm7 << 4) & 0x000003f0;
+  offset |= (instruction.sbtype.imm7 << 1) & 0x00000800;
+  
+  return sign_extend_number(offset, 12);
 }
 
 /* Returns the number of bytes (from the current PC) to the jump label using the
  * given jump instruction */
 int get_jump_offset(Instruction instruction) {
   /* YOUR CODE HERE */
-  return 0;
+
+  int offset = 0x00000000, offset2 = 0x00000000;
+
+  offset |= instruction.ujtype.imm & 0x0007fe00;
+  offset >>= 9;
+  offset2 |= instruction.ujtype.imm & 0x000000ff;
+  offset2 <<= 11;
+  offset |= offset2 & 1U;
+  offset |= (instruction.ujtype.imm << 2) & 0x00000400;
+  offset |= (instruction.ujtype.imm >> 2) & 0x00080000;
+
+  return sign_extend_number(offset, 20);
 }
 
 int get_store_offset(Instruction instruction) {
   /* YOUR CODE HERE */
-  return 0;
+
+  int offset = 0x00000000;
+
+  offset |= instruction.stype.imm5 & 0x0000001f;
+  offset |= (instruction.stype.imm7 << 5) & 0x00000fe0;
+
+  offset = sign_extend_number(offset, 12);
+
+  return offset;
 }
 
 void handle_invalid_instruction(Instruction instruction) {
