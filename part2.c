@@ -378,7 +378,7 @@ void execute_jal(Instruction instruction, Processor *processor) {
 
 void execute_lui(Instruction instruction, Processor *processor) {
     /* YOUR CODE HERE */
-    processor->R[instruction.utype.rd] = (sWord) (sign_extend_number(instruction.itype.imm, 12)) << 12;
+    processor->R[instruction.utype.rd] = (sWord) (sign_extend_number(instruction.utype.imm, 20)) << 12;
     processor->PC += 4;
 }
 
