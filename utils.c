@@ -140,11 +140,11 @@ int get_branch_offset(Instruction instruction) {
 
   int offset = 0x00000000;
 
-  offset |= instruction.sbtype.imm5 & 0x00000001;
-  offset <<= 10;
-  offset |= (instruction.sbtype.imm5 >> 1) & 0x0000000f;
-  offset |= (instruction.sbtype.imm7 << 4) & 0x000003f0;
-  offset |= (instruction.sbtype.imm7 << 5) & 0x00000800;
+  offset |= instruction.sbtype.imm5 & 0x0000001e;
+  offset |= (instruction.sbtype.imm7 << 5) & 0x000007e0;
+  offset |= (instruction.sbtype.imm5 << 11) & 0x00000800;
+  offset |= (instruction.sbtype.imm7 << 6) & 0x00001000;
+
   
   return sign_extend_number(offset, 12);
 }
@@ -154,15 +154,22 @@ int get_branch_offset(Instruction instruction) {
 int get_jump_offset(Instruction instruction) {
   /* YOUR CODE HERE */
 
-  int offset = 0x00000000, offset2 = 0x00000000;
+  int offset = 0x00000000;
 
-  offset |= instruction.ujtype.imm & 0x0007fe00;
+  /*offset |= instruction.ujtype.imm & 0x0007fe00;
   offset >>= 9;
   offset2 |= instruction.ujtype.imm & 0x000000ff;
   offset2 <<= 11;
   offset |= offset2 & 1U;
   offset |= (instruction.ujtype.imm << 2) & 0x00000400;
-  offset |= (instruction.ujtype.imm >> 2) & 0x00080000;
+  offset |= (instruction.ujtype.imm >> 2) & 0x00080000;*/
+
+  offset |= instruction.ujtype.imm & 0x0007fe00;
+  offset |= (instruction.ujtype.imm << 3) & 0x00000400;
+  offset |= (instruction.ujtype.imm << 11) & 0x0007f800;
+  offset |= (instruction.ujtype.imm) & 0x00080000;
+
+
 
   return sign_extend_number(offset, 20);
 }
