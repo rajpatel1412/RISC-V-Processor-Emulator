@@ -144,7 +144,7 @@ int get_branch_offset(Instruction instruction) {
   offset <<= 10;
   offset |= (instruction.sbtype.imm5 >> 1) & 0x0000000f;
   offset |= (instruction.sbtype.imm7 << 4) & 0x000003f0;
-  offset |= (instruction.sbtype.imm7 << 1) & 0x00000800;
+  offset |= (instruction.sbtype.imm7 << 5) & 0x00000800;
   
   return sign_extend_number(offset, 12);
 }
