@@ -200,30 +200,34 @@ void execute_itype_except_load(Instruction instruction, Processor *processor) {
             // ADDI
             processor->R[instruction.itype.rd] = 
                 ((sWord)processor->R[instruction.itype.rs1]) +
-                ((sWord) sign_extend_number(instruction.itype.imm, 12));
-            processor->PC += 4;
+                (sign_extend_number(instruction.itype.imm, 12));
+            processor->PC += 4;            
                         
             break;
         case 0x1:
             // SLLI
             processor->R[instruction.itype.rd] = 
                 ((sWord)processor->R[instruction.itype.rs1]) <<
-                ((sWord) sign_extend_number(instruction.itype.imm, 12));
+                ( sign_extend_number(instruction.itype.imm, 12));
             processor->PC += 4;
 
             break;
         case 0x2:
             // STLI
-            processor->R[instruction.itype.rd] = 
+            /*processor->R[instruction.itype.rd] = 
                 ((sWord)processor->R[instruction.itype.rs1]) <
-                ((sWord) sign_extend_number(instruction.itype.imm, 12)) ? 1 : 0;
+                ( sign_extend_number(instruction.itype.imm, 12)) ? 1 : 0;*/
+            if(((sWord)processor->R[instruction.itype.rs1]) < ( sign_extend_number(instruction.itype.imm, 12)))
+                processor->R[instruction.itype.rd] = 1;
+            else
+                processor->R[instruction.itype.rd] = 0;
             processor->PC += 4;
             break;
         case 0x4:
             // XORI
             processor->R[instruction.itype.rd] = 
                 ((sWord)processor->R[instruction.itype.rs1]) ^
-                ((sWord) sign_extend_number(instruction.itype.imm, 12));
+                (sign_extend_number(instruction.itype.imm, 12));
             processor->PC += 4;
 
             break;
@@ -243,19 +247,20 @@ void execute_itype_except_load(Instruction instruction, Processor *processor) {
             // ORI
             processor->R[instruction.itype.rd] = 
                 ((sWord)processor->R[instruction.itype.rs1]) |
-                ((sWord) sign_extend_number(instruction.itype.imm, 12));
+                (sign_extend_number(instruction.itype.imm, 12));
             processor->PC += 4;
             break;
         case 0x7:
             // ANDI
             processor->R[instruction.itype.rd] = 
                 ((sWord)processor->R[instruction.itype.rs1]) &
-                ((sWord) sign_extend_number(instruction.itype.imm, 12));
+                (sign_extend_number(instruction.itype.imm, 12));
             processor->PC += 4;
             break;
         default:
             handle_invalid_instruction(instruction);
             break;
+        
     }
 }
 
