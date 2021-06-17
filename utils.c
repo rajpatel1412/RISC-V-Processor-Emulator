@@ -164,10 +164,15 @@ int get_jump_offset(Instruction instruction) {
   offset |= (instruction.ujtype.imm << 2) & 0x00000400;
   offset |= (instruction.ujtype.imm >> 2) & 0x00080000;*/
 
-  offset |= instruction.ujtype.imm & 0x0007fe00;
+  /*offset |= instruction.ujtype.imm & 0x0007fe00;
   offset |= (instruction.ujtype.imm << 3) & 0x00000400;
-  offset |= (instruction.ujtype.imm << 11) & 0x0007f800;
-  offset |= (instruction.ujtype.imm) & 0x00080000;
+  offset |= (instruction.ujtype.imm << 12) & 0x0007f800;
+  offset |= (instruction.ujtype.imm << 1) & 0x00080000;*/
+
+  offset |= (instruction.ujtype.imm >> 8) & 0x000007fe;
+  offset |= (instruction.ujtype.imm << 3) & 0x00000800;
+  offset |= (instruction.ujtype.imm << 12) & 0x000ff000;
+  offset |= (instruction.ujtype.imm << 2) & 0x00100000;
 
 
 
